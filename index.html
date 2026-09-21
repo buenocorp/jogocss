@@ -379,6 +379,12 @@
     { css: "text-transform: uppercase;", text: "css", preview: { textTransform: "uppercase", background: "transparent", color: "#e9ebf3", fontSize: "22px" }, options: ["text-case: upper;", "font-transform: uppercase;", "text-transform: uppercase;", "capitalize: true;"] },
     { css: "letter-spacing: 6px;", text: "css", preview: { letterSpacing: "6px", background: "transparent", color: "#e9ebf3", fontSize: "20px" }, options: ["letter-spacing: 6px;", "word-spacing: 6px;", "text-gap: 6px;", "kerning: 6px;"] },
     { css: "opacity: 0.3;", preview: { opacity: "0.3" }, options: ["visibility: 0.3;", "opacity: 0.3;", "filter: fade(0.3);", "transparency: 30%;"] },
+    { css: "text-align: right;", text: "CSS", preview: { textAlign: "right", background: "transparent", color: "#e9ebf3", width: "220px", fontSize: "20px" }, options: ["align: right;", "float: right;", "text-align: right;", "justify-self: right;"] },
+    { css: "font-family: monospace;", text: "Aa", preview: { fontFamily: "monospace", background: "transparent", color: "#e9ebf3", fontSize: "28px" }, options: ["font-family: monospace;", "font-style: mono;", "font-variant: monospace;", "text-family: code;"] },
+    { css: "text-decoration: line-through;", text: "css", preview: { textDecoration: "line-through", background: "transparent", color: "#e9ebf3", fontSize: "24px" }, options: ["text-style: strike;", "text-decoration: line-through;", "border-middle: solid;", "strike: true;"] },
+    { css: "text-shadow: 2px 2px 0 #ff5ca8;", text: "css", preview: { textShadow: "2px 2px 0 #ff5ca8", background: "transparent", color: "#e9ebf3", fontSize: "26px" }, options: ["text-shadow: 2px 2px 0 #ff5ca8;", "box-shadow: 2px 2px 0 #ff5ca8;", "filter: shadow(#ff5ca8);", "outline: 2px 2px #ff5ca8;"] },
+    { css: "background-color: #34d399;", preview: { background: "#34d399" }, options: ["background-color: #34d399;", "color: #34d399;", "border: #34d399;", "fill-color: #34d399;"] },
+    { css: "border-radius: 50% 0 50% 0;", preview: { borderRadius: "50% 0 50% 0" }, options: ["border-radius: 50% 0 50% 0;", "clip-path: leaf();", "transform: rotate(50%);", "border-shape: petal;"] },
   ];
 
   const MEDIUM_QUESTIONS = [
@@ -392,6 +398,14 @@
     { css: "transform: skew(-18deg);", preview: { transform: "skew(-18deg)" }, options: ["transform: skew(-18deg);", "transform: rotate(-18deg);", "transform: perspective(-18deg);", "transform: lean(-18deg);"] },
     { css: "background: radial-gradient(circle, #8b7bff, #1c1f2a);", preview: { background: "radial-gradient(circle, #8b7bff, #1c1f2a)" }, options: ["background: linear-gradient(#8b7bff, #1c1f2a);", "background: radial-gradient(circle, #8b7bff, #1c1f2a);", "background: conic-gradient(#8b7bff, #1c1f2a);", "background: circle(#8b7bff);"] },
     { css: "outline: 4px dotted #ff5ca8;", preview: { outline: "4px dotted #ff5ca8", background: "#1c1f2a" }, options: ["border: 4px dotted #ff5ca8;", "outline: 4px dotted #ff5ca8;", "ring: 4px dotted;", "box-outline: dotted;"] },
+    { css: "background: linear-gradient(to right, #34d399, #7c5cff);", preview: { background: "linear-gradient(to right, #34d399, #7c5cff)" }, options: ["background: linear-gradient(to right, #34d399, #7c5cff);", "background: blend-right(#34d399, #7c5cff);", "background: gradient(90, #34d399);", "background: to-right(#34d399, #7c5cff);"] },
+    { css: "transform: translateY(-14px);", preview: { transform: "translateY(-14px)" }, options: ["margin-top: -14px;", "top: -14px;", "transform: translateY(-14px);", "position: -14px;"] },
+    { css: "border-radius: 50% 50% 0 0;", preview: { borderRadius: "50% 50% 0 0" }, options: ["border-radius: 50% 50% 0 0;", "clip-path: dome();", "border-top: round;", "border-shape: arch;"] },
+    { css: "filter: brightness(1.6);", preview: { filter: "brightness(1.6)" }, options: ["filter: brightness(1.6);", "filter: light(1.6);", "opacity: 1.6;", "filter: exposure(1.6);"] },
+    { css: "filter: contrast(1.8);", preview: { filter: "contrast(1.8)" }, options: ["filter: saturate(1.8);", "filter: contrast(1.8);", "filter: sharpen(1.8);", "filter: vivid(1.8);"] },
+    { css: "transform: rotate(-25deg) scale(1.2);", preview: { transform: "rotate(-25deg) scale(1.2)" }, options: ["transform: rotate(-25deg) scale(1.2);", "transform: skew(-25deg, 1.2);", "transform: rotate(-25deg);", "transform: scale(1.2);"] },
+    { css: "background: linear-gradient(to bottom, #7c5cff, #ff5ca8 80%);", preview: { background: "linear-gradient(to bottom, #7c5cff, #ff5ca8 80%)" }, options: ["background: linear-gradient(to bottom, #7c5cff, #ff5ca8 80%);", "background: linear-gradient(#7c5cff, #ff5ca8);", "background: vertical-gradient(#7c5cff);", "background: fade-bottom(#ff5ca8);"] },
+    { css: "box-shadow: inset 0 0 0 6px #ff5ca8;", preview: { boxShadow: "inset 0 0 0 6px #ff5ca8", background: "#8b7bff" }, options: ["border: inset 6px #ff5ca8;", "box-shadow: inset 0 0 0 6px #ff5ca8;", "outline: inset 6px #ff5ca8;", "box-shadow: 6px #ff5ca8;"] },
   ];
 
   const HARD_QUESTIONS = [
@@ -403,6 +417,10 @@
     { css: "filter: hue-rotate(120deg);", preview: { filter: "hue-rotate(120deg)" }, options: ["filter: hue-rotate(120deg);", "filter: saturate(120%);", "color: rotate(120deg);", "filter: spin-hue(120deg);"] },
     { css: "transform: perspective(300px) rotateY(45deg);", preview: { transform: "perspective(300px) rotateY(45deg)" }, options: ["transform: perspective(300px) rotateY(45deg);", "transform: rotate3d(45deg);", "transform: skewY(45deg);", "transform: flipY(45deg);"] },
     { css: "background: linear-gradient(90deg, #8b7bff 50%, #ff5ca8 50%);", preview: { background: "linear-gradient(90deg, #8b7bff 50%, #ff5ca8 50%)" }, options: ["background: split(#8b7bff, #ff5ca8);", "background: linear-gradient(90deg, #8b7bff 50%, #ff5ca8 50%);", "background: half(#8b7bff, #ff5ca8);", "border-left: 50% #8b7bff;"] },
+    { css: "transform: rotate3d(1, 1, 0, 45deg);", preview: { transform: "rotate3d(1, 1, 0, 45deg)" }, options: ["transform: rotate3d(1, 1, 0, 45deg);", "transform: rotateXY(45deg);", "transform: rotate(45deg, 45deg);", "transform: tilt(45deg);"] },
+    { css: "background: conic-gradient(#8b7bff 0deg 90deg, #ff5ca8 90deg 180deg, #8b7bff 180deg 270deg, #ff5ca8 270deg 360deg);", preview: { background: "conic-gradient(#8b7bff 0deg 90deg, #ff5ca8 90deg 180deg, #8b7bff 180deg 270deg, #ff5ca8 270deg 360deg)" }, options: ["background: checker-gradient();", "background: conic-gradient(#8b7bff 0deg 90deg, #ff5ca8 90deg 180deg, #8b7bff 180deg 270deg, #ff5ca8 270deg 360deg);", "background: grid-gradient(#8b7bff, #ff5ca8);", "background: radial-gradient(quad);"] },
+    { css: "filter: drop-shadow(6px 6px 0 #ff5ca8);", preview: { filter: "drop-shadow(6px 6px 0 #ff5ca8)", background: "linear-gradient(135deg, #8b7bff, #5a4bd6)" }, options: ["box-shadow: 6px 6px 0 #ff5ca8;", "filter: drop-shadow(6px 6px 0 #ff5ca8);", "filter: shadow-drop(#ff5ca8);", "outline: drop-shadow(#ff5ca8);"] },
+    { css: "clip-path: circle(35% at 30% 30%);", preview: { clipPath: "circle(35% at 30% 30%)", background: "linear-gradient(135deg, #8b7bff, #5a4bd6)" }, options: ["clip-path: circle(35% at 30% 30%);", "border-radius: 35% 30%;", "mask: circle(30%);", "transform: circle(35%);"] },
   ];
 
   const CHALLENGE_QUESTIONS = [
@@ -416,6 +434,8 @@
     { question: "🔥 Desafio! Em flexbox, qual propriedade alinha itens no eixo principal?", options: ["align-items", "justify-content", "flex-align", "align-self"], correct: 1 },
     { question: "🔥 Desafio! Qual valor de 'display' remove totalmente o elemento do layout?", options: ["hidden", "invisible", "none", "collapse"], correct: 2 },
     { question: "🔥 Desafio! O que a propriedade 'z-index' controla?", options: ["A cor de fundo", "A ordem de empilhamento (eixo Z)", "O tamanho da fonte", "O espaçamento entre linhas"], correct: 1 },
+    { question: "🔥 Desafio! Qual propriedade define a transparência do elemento inteiro (incluindo bordas e conteúdo)?", options: ["color", "background", "opacity", "visibility"], correct: 2 },
+    { question: "🔥 Desafio! Qual valor de 'box-sizing' inclui padding e borda dentro da largura definida?", options: ["content-box", "border-box", "padding-box", "inherit"], correct: 1 },
   ];
 
   const POOLS = { easy: EASY_QUESTIONS, medium: MEDIUM_QUESTIONS, hard: HARD_QUESTIONS, challenge: CHALLENGE_QUESTIONS };
@@ -429,19 +449,51 @@
     return "hard";
   }
 
-  function buildSquares() {
-    const arr = [];
-    for (let n = 1; n <= BOARD_SIZE; n++) {
-      const difficulty = getDifficulty(n);
-      const pool = POOLS[difficulty];
-      arr.push({ number: n, difficulty, qIndex: Math.floor(Math.random() * pool.length) });
+  function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
+    return a;
+  }
+
+  function buildSquares() {
+    const arr = new Array(BOARD_SIZE);
+    const squaresByDifficulty = { easy: [], medium: [], hard: [], challenge: [] };
+
+    for (let n = 1; n <= BOARD_SIZE; n++) {
+      squaresByDifficulty[getDifficulty(n)].push(n);
+    }
+
+    Object.keys(squaresByDifficulty).forEach((difficulty) => {
+      const pool = POOLS[difficulty];
+      const shuffledIndices = shuffleArray(pool.map((_, i) => i));
+      squaresByDifficulty[difficulty].forEach((n, i) => {
+        arr[n - 1] = { number: n, difficulty, qIndex: shuffledIndices[i % shuffledIndices.length] };
+      });
+    });
+
     return arr;
   }
 
   function reassignQuestion(square) {
     const pool = POOLS[square.difficulty];
     if (pool.length <= 1) return;
+
+    const usedElsewhere = new Set(
+      squares.filter((s) => s.difficulty === square.difficulty && s !== square).map((s) => s.qIndex)
+    );
+    const available = [];
+    for (let i = 0; i < pool.length; i++) {
+      if (i !== square.qIndex && !usedElsewhere.has(i)) available.push(i);
+    }
+
+    if (available.length > 0) {
+      square.qIndex = available[Math.floor(Math.random() * available.length)];
+      return;
+    }
+
     let idx;
     do { idx = Math.floor(Math.random() * pool.length); } while (idx === square.qIndex);
     square.qIndex = idx;
