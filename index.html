@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabuleiro CSS</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #171a24;
+    --panel-2: #1f2330;
+    --border: #2b2f3d;
+    --text: #e9ebf3;
+    --muted: #9aa0b4;
+    --accent: #7c5cff;
+    --accent-2: #ff5ca8;
+    --good: #34d399;
+    --bad: #f87171;
+    --easy: #34d399;
+    --medium: #fbbf24;
+    --hard: #f87171;
+    --challenge: #ff8a3d;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+
+  body {
+    background: radial-gradient(circle at 20% -10%, #23283a 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .game {
+    width: 100%;
+    max-width: 820px;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    margin-bottom: 16px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  h1 { font-size: 21px; margin: 0; letter-spacing: -0.02em; }
+  h1 span {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  .restart-link {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .restart-link:hover { color: var(--text); border-color: var(--accent); }
+
+  .hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .hud-info { font-size: 13px; color: var(--muted); }
+  .hud-info strong { color: var(--text); font-size: 16px; display: block; }
+
+  .dice-row { display: flex; align-items: center; gap: 12px; }
+
+  #dice-face {
+    font-size: 40px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  #roll-btn {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.15s ease;
+  }
+  #roll-btn:hover:not(:disabled) { transform: translateY(-2px); }
+  #roll-btn:disabled { opacity: 0.5; cursor: default; }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  .board-scroll {
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  #board-wrapper {
+    position: relative;
+    display: inline-block;
+    min-width: 660px;
+  }
+
+  #board {
+    display: grid;
+    grid-template-columns: 56px repeat(10, 56px);
+    grid-template-rows: repeat(5, 56px);
+    gap: 6px;
+  }
+
+  .start-marker, .sq {
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+
+  .start-marker {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: white;
+    font-size: 18px;
+  }
+
+  .sq .num { font-size: 12px; }
+  .sq .icon { font-size: 13px; margin-top: 1px; }
+
+  .sq.easy { border-color: rgba(52,211,153,0.4); }
+  .sq.medium { border-color: rgba(251,191,36,0.4); }
+  .sq.hard { border-color: rgba(248,113,113,0.4); }
+  .sq.challenge { border-color: rgba(255,138,61,0.5); background: rgba(255,138,61,0.08); }
+
+  .sq.current {
+    box-shadow: 0 0 0 2px var(--accent-2), 0 0 18px rgba(255,92,168,0.6);
+    transform: scale(1.06);
+    z-index: 2;
+  }
+
+  .sq.finish { background: linear-gradient(135deg, #ffd76a22, #ff5ca822); }
+
+  #token {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, var(--accent-2) 60%, var(--accent) 100%);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: left 0.22s ease, top 0.22s ease;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6,7,12,0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .overlay.hidden { display: none; }
+
+  .modal {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+  }
+
+  .modal-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .modal-title { font-size: 15px; margin: 0 0 14px; line-height: 1.4; }
+
+  .modal-stage {
+    background:
+      linear-gradient(45deg, #262a38 25%, transparent 25%) -10px 0/20px 20px,
+      linear-gradient(-45deg, #262a38 25%, transparent 25%) -10px 0/20px 20px,
+      linear-gradient(45deg, transparent 75%, #262a38 75%) -10px 0/20px 20px,
+      linear-gradient(-45deg, transparent 75%, #262a38 75%) -10px 0/20px 20px,
+      #1c1f2a;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .modal-stage.hidden { display: none; }
+
+  #modal-preview {
+    width: 84px;
+    height: 84px;
+    background: linear-gradient(135deg, #8b7bff, #5a4bd6);
+  }
+
+  .modal-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .opt-btn {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 13px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    padding: 12px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-2px); }
+  .opt-btn:disabled { cursor: default; }
+  .opt-btn.correct { background: rgba(52,211,153,0.15); border-color: var(--good); color: var(--good); }
+  .opt-btn.wrong { background: rgba(248,113,113,0.15); border-color: var(--bad); color: var(--bad); }
+
+  .modal-feedback {
+    min-height: 20px;
+    margin: 14px 0 0;
+    font-size: 13px;
+    text-align: center;
+  }
+  .modal-feedback.good { color: var(--good); }
+  .modal-feedback.bad { color: var(--bad); }
+
+  .victory-modal { text-align: center; }
+  .victory-modal .big { font-size: 48px; margin-bottom: 6px; }
+  .victory-modal p { color: var(--muted); font-size: 14px; }
+  .victory-modal button {
+    margin-top: 14px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: white; border: none; padding: 10px 22px; border-radius: 999px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+
+  @media (max-width: 480px) {
+    .modal-options { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="game">
+  <div class="card">
+    <header>
+      <h1>🎲 Tabuleiro <span>CSS</span></h1>
+      <button class="restart-link" id="restart-link">Reiniciar jogo</button>
+    </header>
+
+    <div class="hud">
+      <div class="hud-info">
+        Posição atual
+        <strong id="position-label">Início</strong>
+      </div>
+      <div class="hud-info">
+        Tempo
+        <strong id="timer-label">00:00</strong>
+      </div>
+      <div class="dice-row">
+        <div id="dice-face">🎲</div>
+        <button id="roll-btn">Rolar dado</button>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><span class="dot" style="background:var(--easy)"></span>Fácil (1–15)</span>
+      <span><span class="dot" style="background:var(--medium)"></span>Médio (16–20 e 31–40)</span>
+      <span><span class="dot" style="background:var(--challenge)"></span>Desafio (21–30)</span>
+      <span><span class="dot" style="background:var(--hard)"></span>Difícil (41–50)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="board-scroll">
+      <div id="board-wrapper">
+        <div id="board"></div>
+        <div id="token"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="modal-overlay">
+  <div class="modal">
+    <span class="modal-badge" id="modal-badge"></span>
+    <p class="modal-title" id="modal-title"></p>
+    <div class="modal-stage hidden" id="modal-stage">
+      <div id="modal-preview"></div>
+    </div>
+    <div class="modal-options" id="modal-options"></div>
+    <p class="modal-feedback" id="modal-feedback"></p>
+  </div>
+</div>
+
+<div class="overlay hidden" id="victory-overlay">
+  <div class="modal victory-modal">
+    <div class="big">🏆</div>
+    <h2>Você venceu!</h2>
+    <p>Você percorreu as 50 casas do tabuleiro de CSS.</p>
+    <p><strong id="victory-time"></strong></p>
+    <button id="victory-restart">Jogar novamente</button>
+  </div>
+</div>
+
+<script>
+  const BOARD_SIZE = 50;
+
+  const EASY_QUESTIONS = [
+    { css: "background-color: #ff5ca8;", preview: { background: "#ff5ca8" }, options: ["background-color: #ff5ca8;", "color: #ff5ca8;", "border-color: #ff5ca8;", "outline: #ff5ca8;"] },
+    { css: "color: #ff5ca8;", text: "Aa", preview: { color: "#ff5ca8", background: "transparent", fontSize: "36px", fontWeight: "700" }, options: ["background: #ff5ca8;", "color: #ff5ca8;", "border: #ff5ca8;", "fill: #ff5ca8;"] },
+    { css: "font-size: 42px;", text: "Aa", preview: { fontSize: "42px", background: "transparent", color: "#e9ebf3" }, options: ["font-size: 42px;", "font-weight: 42px;", "line-height: 42px;", "zoom: 42;"] },
+    { css: "text-align: center;", text: "CSS", preview: { textAlign: "center", background: "transparent", color: "#e9ebf3", width: "220px", fontSize: "20px" }, options: ["align: center;", "text-align: center;", "justify-content: center;", "float: center;"] },
+    { css: "border: 4px solid #ff5ca8;", preview: { border: "4px solid #ff5ca8", background: "transparent" }, options: ["outline: 4px solid #ff5ca8;", "border: 4px solid #ff5ca8;", "box-shadow: 4px solid;", "stroke: #ff5ca8;"] },
+    { css: "font-weight: bold;", text: "Aa", preview: { fontWeight: "700", background: "transparent", color: "#e9ebf3", fontSize: "26px" }, options: ["font-style: bold;", "font-weight: bold;", "text-style: bold;", "font-boldness: 700;"] },
+    { css: "text-decoration: underline;", text: "css", preview: { textDecoration: "underline", background: "transparent", color: "#e9ebf3", fontSize: "24px" }, options: ["text-style: underline;", "border-bottom: underline;", "text-decoration: underline;", "underline: true;"] },
+    { css: "border-radius: 16px;", preview: { borderRadius: "16px" }, options: ["border-round: 16px;", "corner-radius: 16px;", "border-radius: 16px;", "radius: 16px;"] },
+    { css: "font-style: italic;", text: "css", preview: { fontStyle: "italic", background: "transparent", color: "#e9ebf3", fontSize: "24px" }, options: ["font-style: italic;", "font-slant: italic;", "text-italic: true;", "font-family: italic;"] },
+    { css: "text-transform: uppercase;", text: "css", preview: { textTransform: "uppercase", background: "transparent", color: "#e9ebf3", fontSize: "22px" }, options: ["text-case: upper;", "font-transform: uppercase;", "text-transform: uppercase;", "capitalize: true;"] },
+    { css: "letter-spacing: 6px;", text: "css", preview: { letterSpacing: "6px", background: "transparent", color: "#e9ebf3", fontSize: "20px" }, options: ["letter-spacing: 6px;", "word-spacing: 6px;", "text-gap: 6px;", "kerning: 6px;"] },
+    { css: "opacity: 0.3;", preview: { opacity: "0.3" }, options: ["visibility: 0.3;", "opacity: 0.3;", "filter: fade(0.3);", "transparency: 30%;"] },
+  ];
+
+  const MEDIUM_QUESTIONS = [
+    { css: "box-shadow: 0 0 25px 8px #ff5ca8;", preview: { boxShadow: "0 0 25px 8px #ff5ca8" }, options: ["filter: glow(#ff5ca8);", "box-shadow: 0 0 25px 8px #ff5ca8;", "outline: 25px #ff5ca8;", "text-shadow: 0 0 25px #ff5ca8;"] },
+    { css: "transform: rotate(35deg);", preview: { transform: "rotate(35deg)" }, options: ["transform: skew(35deg);", "rotate: 35;", "transform: rotate(35deg);", "transform: angle(35deg);"] },
+    { css: "transform: scale(1.4);", preview: { transform: "scale(1.4)" }, options: ["transform: scale(1.4);", "zoom: 1.4;", "width: 140%;", "transform: grow(1.4);"] },
+    { css: "background: linear-gradient(135deg, #8b7bff, #ff5ca8);", preview: { background: "linear-gradient(135deg, #8b7bff, #ff5ca8)" }, options: ["background: linear-gradient(135deg, #8b7bff, #ff5ca8);", "background: blend(#8b7bff, #ff5ca8);", "background: mix(#8b7bff, #ff5ca8);", "background: dual-color(135deg);"] },
+    { css: "border-style: dashed;", preview: { border: "4px dashed #ff5ca8", background: "transparent" }, options: ["border-style: dashed;", "border-type: dashed;", "outline-style: dashed;", "border-pattern: dashed;"] },
+    { css: "filter: blur(4px);", preview: { filter: "blur(4px)" }, options: ["filter: blur(4px);", "opacity: blur(4px);", "backdrop-filter: blur(4px);", "transform: blur(4px);"] },
+    { css: "filter: grayscale(100%);", preview: { filter: "grayscale(100%)" }, options: ["filter: grayscale(100%);", "color: grayscale;", "background: gray;", "filter: invert(100%);"] },
+    { css: "transform: skew(-18deg);", preview: { transform: "skew(-18deg)" }, options: ["transform: skew(-18deg);", "transform: rotate(-18deg);", "transform: perspective(-18deg);", "transform: lean(-18deg);"] },
+    { css: "background: radial-gradient(circle, #8b7bff, #1c1f2a);", preview: { background: "radial-gradient(circle, #8b7bff, #1c1f2a)" }, options: ["background: linear-gradient(#8b7bff, #1c1f2a);", "background: radial-gradient(circle, #8b7bff, #1c1f2a);", "background: conic-gradient(#8b7bff, #1c1f2a);", "background: circle(#8b7bff);"] },
+    { css: "outline: 4px dotted #ff5ca8;", preview: { outline: "4px dotted #ff5ca8", background: "#1c1f2a" }, options: ["border: 4px dotted #ff5ca8;", "outline: 4px dotted #ff5ca8;", "ring: 4px dotted;", "box-outline: dotted;"] },
+  ];
+
+  const HARD_QUESTIONS = [
+    { css: "clip-path: polygon(50% 0%, 0% 100%, 100% 100%);", preview: { clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)", background: "linear-gradient(135deg, #8b7bff, #5a4bd6)" }, options: ["shape-outside: triangle();", "clip-path: polygon(50% 0%, 0% 100%, 100% 100%);", "mask: triangle();", "transform: triangle();"] },
+    { css: "background: conic-gradient(from 90deg, #8b7bff, #ff5ca8, #8b7bff);", preview: { background: "conic-gradient(from 90deg, #8b7bff, #ff5ca8, #8b7bff)", borderRadius: "50%" }, options: ["background: radial-gradient(circle, #8b7bff, #ff5ca8);", "background: conic-gradient(from 90deg, #8b7bff, #ff5ca8, #8b7bff);", "background: sweep-gradient();", "animation: rotate-colors 2s;"] },
+    { css: "background: repeating-linear-gradient(45deg, #8b7bff, #8b7bff 10px, #5a4bd6 10px, #5a4bd6 20px);", preview: { background: "repeating-linear-gradient(45deg, #8b7bff, #8b7bff 10px, #5a4bd6 10px, #5a4bd6 20px)" }, options: ["background: repeating-linear-gradient(45deg, #8b7bff, #8b7bff 10px, #5a4bd6 10px, #5a4bd6 20px);", "background: stripes(45deg);", "border-image: repeating-linear-gradient(45deg);", "background: pattern(45deg);"] },
+    { css: "transform: scaleX(1.8);", preview: { transform: "scaleX(1.8)" }, options: ["transform: scaleX(1.8);", "width: 180%;", "transform: skewX(1.8);", "transform: stretchX(1.8);"] },
+    { css: "box-shadow: 8px 8px 0 #ff5ca8;", preview: { boxShadow: "8px 8px 0 #ff5ca8", background: "#8b7bff" }, options: ["box-shadow: 8px 8px 0 #ff5ca8;", "border-offset: 8px #ff5ca8;", "outline-offset: 8px #ff5ca8;", "transform: translate-shadow(8px);"] },
+    { css: "filter: hue-rotate(120deg);", preview: { filter: "hue-rotate(120deg)" }, options: ["filter: hue-rotate(120deg);", "filter: saturate(120%);", "color: rotate(120deg);", "filter: spin-hue(120deg);"] },
+    { css: "transform: perspective(300px) rotateY(45deg);", preview: { transform: "perspective(300px) rotateY(45deg)" }, options: ["transform: perspective(300px) rotateY(45deg);", "transform: rotate3d(45deg);", "transform: skewY(45deg);", "transform: flipY(45deg);"] },
+    { css: "background: linear-gradient(90deg, #8b7bff 50%, #ff5ca8 50%);", preview: { background: "linear-gradient(90deg, #8b7bff 50%, #ff5ca8 50%)" }, options: ["background: split(#8b7bff, #ff5ca8);", "background: linear-gradient(90deg, #8b7bff 50%, #ff5ca8 50%);", "background: half(#8b7bff, #ff5ca8);", "border-left: 50% #8b7bff;"] },
+  ];
+
+  const CHALLENGE_QUESTIONS = [
+    { question: "🔥 Desafio! Qual é o valor padrão da propriedade 'position'?", options: ["static", "relative", "absolute", "fixed"], correct: 0 },
+    { question: "🔥 Desafio! Qual seletor tem a MAIOR especificidade?", options: ["tag (div)", ".classe", "#id", "*"], correct: 2 },
+    { question: "🔥 Desafio! No box model, qual camada fica mais próxima do conteúdo?", options: ["margin", "border", "padding", "outline"], correct: 2 },
+    { question: "🔥 Desafio! Qual unidade é relativa ao elemento raiz (html)?", options: ["em", "%", "rem", "vh"], correct: 2 },
+    { question: "🔥 Desafio! Qual propriedade define o espaço ENTRE itens no flexbox/grid?", options: ["margin", "gap", "padding", "spacing"], correct: 1 },
+    { question: "🔥 Desafio! Qual destas propriedades NÃO é herdada pelos filhos por padrão?", options: ["color", "font-family", "border", "line-height"], correct: 2 },
+    { question: "🔥 Desafio! Qual pseudo-classe seleciona o primeiro filho de um elemento?", options: [":first", ":first-child", ":child(1)", ":nth(0)"], correct: 1 },
+    { question: "🔥 Desafio! Em flexbox, qual propriedade alinha itens no eixo principal?", options: ["align-items", "justify-content", "flex-align", "align-self"], correct: 1 },
+    { question: "🔥 Desafio! Qual valor de 'display' remove totalmente o elemento do layout?", options: ["hidden", "invisible", "none", "collapse"], correct: 2 },
+    { question: "🔥 Desafio! O que a propriedade 'z-index' controla?", options: ["A cor de fundo", "A ordem de empilhamento (eixo Z)", "O tamanho da fonte", "O espaçamento entre linhas"], correct: 1 },
+  ];
+
+  const POOLS = { easy: EASY_QUESTIONS, medium: MEDIUM_QUESTIONS, hard: HARD_QUESTIONS, challenge: CHALLENGE_QUESTIONS };
+  const ICONS = { easy: "🟢", medium: "🟡", hard: "🔴", challenge: "🔥" };
+  const LABELS = { easy: "Fácil", medium: "Médio", hard: "Difícil", challenge: "Desafio" };
+
+  function getDifficulty(n) {
+    if (n >= 21 && n <= 30) return "challenge";
+    if (n <= 15) return "easy";
+    if (n <= 40) return "medium";
+    return "hard";
+  }
+
+  function buildSquares() {
+    const arr = [];
+    for (let n = 1; n <= BOARD_SIZE; n++) {
+      const difficulty = getDifficulty(n);
+      const pool = POOLS[difficulty];
+      arr.push({ number: n, difficulty, qIndex: Math.floor(Math.random() * pool.length) });
+    }
+    return arr;
+  }
+
+  function reassignQuestion(square) {
+    const pool = POOLS[square.difficulty];
+    if (pool.length <= 1) return;
+    let idx;
+    do { idx = Math.floor(Math.random() * pool.length); } while (idx === square.qIndex);
+    square.qIndex = idx;
+  }
+
+  function getQuestionData(square) {
+    const pool = POOLS[square.difficulty];
+    const q = pool[square.qIndex];
+    if (square.difficulty === "challenge") {
+      return {
+        prompt: q.question,
+        preview: null,
+        text: null,
+        options: q.options,
+        correctValue: q.options[q.correct],
+      };
+    }
+    return {
+      prompt: "Qual declaração CSS gerou este resultado?",
+      preview: q.preview,
+      text: q.text || null,
+      options: q.options,
+      correctValue: q.css,
+    };
+  }
+
+  function computeGridPos(n) {
+    const rowFromBottom = Math.floor((n - 1) / 10);
+    const p = (n - 1) % 10;
+    const row = 5 - rowFromBottom;
+    const col = rowFromBottom % 2 === 0 ? p + 2 : 11 - p;
+    return { row, col };
+  }
+
+  const boardEl = document.getElementById("board");
+  const boardWrapper = document.getElementById("board-wrapper");
+  const tokenEl = document.getElementById("token");
+  const diceFaceEl = document.getElementById("dice-face");
+  const rollBtn = document.getElementById("roll-btn");
+  const positionLabel = document.getElementById("position-label");
+  const timerLabel = document.getElementById("timer-label");
+  const restartLink = document.getElementById("restart-link");
+
+  const modalOverlay = document.getElementById("modal-overlay");
+  const modalBadge = document.getElementById("modal-badge");
+  const modalTitle = document.getElementById("modal-title");
+  const modalStage = document.getElementById("modal-stage");
+  const modalPreview = document.getElementById("modal-preview");
+  const modalOptions = document.getElementById("modal-options");
+  const modalFeedback = document.getElementById("modal-feedback");
+
+  const victoryOverlay = document.getElementById("victory-overlay");
+  const victoryRestart = document.getElementById("victory-restart");
+  const victoryTime = document.getElementById("victory-time");
+
+  const DICE_FACES = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+
+  let squares = [];
+  let squareEls = {};
+  let startMarkerEl = null;
+  let position = 0;
+  let isRolling = false;
+  let isAnswering = false;
+  let gameWon = false;
+
+  let timerInterval = null;
+  let timerStarted = false;
+  let elapsedSeconds = 0;
+
+  function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+
+  function formatTime(totalSeconds) {
+    const m = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+    const s = (totalSeconds % 60).toString().padStart(2, "0");
+    return m + ":" + s;
+  }
+
+  function updateTimerDisplay() {
+    timerLabel.textContent = formatTime(elapsedSeconds);
+  }
+
+  function startTimerIfNeeded() {
+    if (timerStarted) return;
+    timerStarted = true;
+    timerInterval = setInterval(() => {
+      elapsedSeconds++;
+      updateTimerDisplay();
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+  }
+
+  function renderBoard() {
+    boardEl.innerHTML = "";
+    squareEls = {};
+
+    startMarkerEl = document.createElement("div");
+    startMarkerEl.className = "start-marker";
+    startMarkerEl.style.gridRow = 5;
+    startMarkerEl.style.gridColumn = 1;
+    startMarkerEl.textContent = "🏁";
+    boardEl.appendChild(startMarkerEl);
+
+    squares.forEach((sq) => {
+      const { row, col } = computeGridPos(sq.number);
+      const el = document.createElement("div");
+      el.className = "sq " + sq.difficulty + (sq.number === BOARD_SIZE ? " finish" : "");
+      el.style.gridRow = row;
+      el.style.gridColumn = col;
+      const numEl = document.createElement("div");
+      numEl.className = "num";
+      numEl.textContent = sq.number;
+      const iconEl = document.createElement("div");
+      iconEl.className = "icon";
+      iconEl.textContent = sq.number === BOARD_SIZE ? "🏆" : ICONS[sq.difficulty];
+      el.appendChild(numEl);
+      el.appendChild(iconEl);
+      boardEl.appendChild(el);
+      squareEls[sq.number] = el;
+    });
+
+    updateCurrentHighlight();
+  }
+
+  function updateCurrentHighlight() {
+    Object.values(squareEls).forEach((el) => el.classList.remove("current"));
+    if (position > 0 && squareEls[position]) squareEls[position].classList.add("current");
+  }
+
+  function positionTokenAt(el, animate) {
+    const left = el.offsetLeft + el.offsetWidth / 2 - tokenEl.offsetWidth / 2;
+    const top = el.offsetTop + el.offsetHeight / 2 - tokenEl.offsetHeight / 2;
+    if (!animate) tokenEl.style.transition = "none";
+    tokenEl.style.left = left + "px";
+    tokenEl.style.top = top + "px";
+    if (!animate) {
+      requestAnimationFrame(() => { tokenEl.style.transition = ""; });
+    }
+  }
+
+  function snapToken() {
+    const el = position === 0 ? startMarkerEl : squareEls[position];
+    if (el) positionTokenAt(el, false);
+  }
+
+  async function animateMove(fromN, toN) {
+    for (let n = fromN + 1; n <= toN; n++) {
+      positionTokenAt(squareEls[n], true);
+      position = n;
+      updateCurrentHighlight();
+      updateHUD();
+      await sleep(220);
+    }
+  }
+
+  function updateHUD() {
+    positionLabel.textContent = position === 0 ? "Início" : "Casa " + position + " / " + BOARD_SIZE;
+  }
+
+  const DICE_WEIGHTS = [22, 20, 17, 15, 14, 12];
+
+  function rollWeightedDie() {
+    const total = DICE_WEIGHTS.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < DICE_WEIGHTS.length; i++) {
+      if (r < DICE_WEIGHTS[i]) return i + 1;
+      r -= DICE_WEIGHTS[i];
+    }
+    return DICE_WEIGHTS.length;
+  }
+
+  async function rollDice() {
+    if (isRolling || isAnswering || gameWon) return;
+    isRolling = true;
+    rollBtn.disabled = true;
+    startTimerIfNeeded();
+
+    for (let i = 0; i < 8; i++) {
+      diceFaceEl.textContent = DICE_FACES[1 + Math.floor(Math.random() * 6)];
+      await sleep(55);
+    }
+    const roll = rollWeightedDie();
+    diceFaceEl.textContent = DICE_FACES[roll];
+
+    const target = Math.min(position + roll, BOARD_SIZE);
+    const from = position;
+    await animateMove(from, target);
+
+    isRolling = false;
+    handleLanding(target);
+  }
+
+  function handleLanding(n) {
+    isAnswering = true;
+    const square = squares[n - 1];
+    const data = getQuestionData(square);
+
+    modalBadge.textContent = "Casa " + n + " · " + LABELS[square.difficulty];
+    modalTitle.textContent = data.prompt;
+    modalFeedback.textContent = "";
+    modalFeedback.className = "modal-feedback";
+
+    if (data.preview) {
+      modalStage.classList.remove("hidden");
+      modalPreview.removeAttribute("style");
+      modalPreview.style.width = "84px";
+      modalPreview.style.height = "84px";
+      if (!("background" in data.preview)) {
+        modalPreview.style.background = "linear-gradient(135deg, #8b7bff, #5a4bd6)";
+      }
+      Object.assign(modalPreview.style, data.preview);
+      modalPreview.textContent = data.text || "";
+    } else {
+      modalStage.classList.add("hidden");
+    }
+
+    const shuffled = data.options.slice().sort(() => Math.random() - 0.5);
+    modalOptions.innerHTML = "";
+    shuffled.forEach((opt) => {
+      const btn = document.createElement("button");
+      btn.className = "opt-btn";
+      btn.textContent = opt;
+      btn.addEventListener("click", () => onAnswer(btn, opt, data.correctValue, square, n));
+      modalOptions.appendChild(btn);
+    });
+
+    modalOverlay.classList.remove("hidden");
+  }
+
+  async function onAnswer(btn, chosen, correctValue, square, n) {
+    const allBtns = modalOptions.querySelectorAll(".opt-btn");
+    if (allBtns[0] && allBtns[0].disabled) return;
+    allBtns.forEach((b) => {
+      b.disabled = true;
+      if (b.textContent === correctValue) b.classList.add("correct");
+    });
+
+    const correct = chosen === correctValue;
+
+    if (correct) {
+      modalFeedback.textContent = "✅ Acertou!";
+      modalFeedback.classList.add("good");
+    } else {
+      btn.classList.add("wrong");
+      modalFeedback.textContent = "❌ Errado! Você volta para o início.";
+      modalFeedback.classList.add("bad");
+      reassignQuestion(square);
+    }
+
+    await sleep(1400);
+    modalOverlay.classList.add("hidden");
+
+    if (correct && n === BOARD_SIZE) {
+      gameWon = true;
+      stopTimer();
+      victoryTime.textContent = "Tempo total: " + formatTime(elapsedSeconds);
+      victoryOverlay.classList.remove("hidden");
+      return;
+    }
+
+    if (!correct) {
+      const from = position;
+      position = 0;
+      positionTokenAt(startMarkerEl, true);
+      updateCurrentHighlight();
+      updateHUD();
+      await sleep(260);
+    }
+
+    isAnswering = false;
+    rollBtn.disabled = false;
+  }
+
+  function resetGame() {
+    squares = buildSquares();
+    position = 0;
+    isRolling = false;
+    isAnswering = false;
+    gameWon = false;
+    diceFaceEl.textContent = "🎲";
+    rollBtn.disabled = false;
+    modalOverlay.classList.add("hidden");
+    victoryOverlay.classList.add("hidden");
+    stopTimer();
+    timerStarted = false;
+    elapsedSeconds = 0;
+    updateTimerDisplay();
+    renderBoard();
+    updateHUD();
+    requestAnimationFrame(snapToken);
+  }
+
+  rollBtn.addEventListener("click", rollDice);
+  restartLink.addEventListener("click", resetGame);
+  victoryRestart.addEventListener("click", resetGame);
+  window.addEventListener("resize", snapToken);
+
+  resetGame();
+</script>
+
+</body>
+</html>
